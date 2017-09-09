@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Happy Shopper</string>
+    <string name="sale">Sale</string>
+    <string name="empty_store_title">Empty Store</string>
+    <string name="empty_store_text">To add iems to the shop, click on the + icon and enter the product details</string>
+    <string name="hint_product_name">Product Name</string>
+    <string name="hint_quantity">Quantity</string>
+    <string name="product_name_title">Product Name:</string>
+    <string name="product_quantity_title">Quantity:</string>
+    <string name="hint_product_quantity">Quantity</string>
+    <string name="product_price_title">Price:</string>
+    <string name="hint_product_price">Price</string>
+    <string name="currency_unit">£</string>
+    <string name="hint_product_supplier">Supplier</string>
+    <string name="product_image_title">Image:</string>
+    <string name="quantity_to_adjust_title">Quantity to adjust:</string>
+    <string name="hint_quantity_to_adjust">Quantity Change</string>
+    <string name="decrement">Decrement</string>
+    <string name="increment">Increment</string>
+    <string name="order_button_text">Order</string>
+    <string name="delete_product_button_text">Delete Product</string>
+    <string name="new_item">Add a new item</string>
+    <string name="edit_item">Edit Item</string>
+    <string name="editor_insert_item_failed">Error with saving Item</string>
+    <string name="editor_insert_item_successful">Item Saved</string>
+    <string name="editor_update_item_failed">Error with updating Item</string>
+    <string name="editor_update_item_successful">Item Updated</string>
+    <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
+    <string name="title_name">Product:</string>
+    <string name="title_quantity">In Stock:</string>
+    <string name="title_price">Price:</string>
+    <string name="currency">£</string>
+</resources>
