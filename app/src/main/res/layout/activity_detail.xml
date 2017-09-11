@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context=".EditorActivity">
 
     <LinearLayout
@@ -86,7 +88,7 @@
                 android:id="@+id/supplier_contact_title"
                 style="@style/CategoryStyle"
                 android:layout_weight="1"
-                android:text="@string/product_quantity_title" />
+                android:text="@string/product_supplier_title" />
 
             <EditText
                 android:id="@+id/edit_product_supplier"

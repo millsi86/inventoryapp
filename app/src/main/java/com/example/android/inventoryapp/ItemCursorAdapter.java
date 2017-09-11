@@ -1,10 +1,14 @@
 package com.example.android.inventoryapp;
 
+import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
@@ -29,7 +33,8 @@ public class ItemCursorAdapter extends CursorAdapter {
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(View view, final Context context, Cursor cursor) {
+        final int itemId = cursor.getInt(cursor.getColumnIndexOrThrow(ItemEntry._ID));
         // Find individual views to modify on the list item
         TextView nameTextView = view.findViewById(R.id.name);
         TextView quantityTextView = view.findViewById(R.id.quantity);
@@ -42,7 +47,7 @@ public class ItemCursorAdapter extends CursorAdapter {
 
         // Read the item attributs from the Cursor for the current pet
         String itemName = cursor.getString(nameColumnIndex);
-        String itemQuantity = cursor.getString(quantityColumnIndex);
+        final String itemQuantity = cursor.getString(quantityColumnIndex);
         Double itemPrice = Double.valueOf(cursor.getString(priceColumnIndex));
 
         // formats the price to 2dp
@@ -52,5 +57,21 @@ public class ItemCursorAdapter extends CursorAdapter {
         nameTextView.setText(itemName);
         quantityTextView.setText(itemQuantity);
         priceTextView.setText(itemprice_2dp);
+
+        // On saleButton press decrement the quantity and update teh db
+        Button saleButton = view.findViewById(R.id.sale_button);
+        saleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view1) {
+                ContentValues values = new ContentValues();
+                Integer quantity = Integer.parseInt(itemQuantity);
+                if (quantity > 0) {
+                    quantity--;
+                    values.put(ItemEntry.COLUMN_ITEM_QUANTITY, quantity);
+                    Uri uri = ContentUris.withAppendedId(ItemEntry.CONTENT_URI, itemId);
+                    context.getContentResolver().update(uri, values, null, null);
+                }
+            }
+        });
     }
 }

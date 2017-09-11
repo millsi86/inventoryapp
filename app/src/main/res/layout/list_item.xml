@@ -45,6 +45,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:clickable="true"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         android:text="@string/sale" />
 
     <LinearLayout

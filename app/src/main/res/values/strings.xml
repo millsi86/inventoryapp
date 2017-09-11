@@ -31,4 +31,13 @@
     <string name="title_quantity">In Stock:</string>
     <string name="title_price">Price:</string>
     <string name="currency">£</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete">Delete</string>
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep Editing</string>
+    <string name="invalid_email_address">Please enter a valid supplier e-mail address</string>
+    <string name="product_supplier_title">Supplier:</string>
+
 </resources>

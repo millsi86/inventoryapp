@@ -1,7 +1,9 @@
 package com.example.android.inventoryapp;
 
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -10,11 +12,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
-import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
+import static com.example.android.inventoryapp.data.ItemContract.ItemEntry;
 
 
 public class ShopActivity extends AppCompatActivity implements
@@ -25,6 +29,44 @@ public class ShopActivity extends AppCompatActivity implements
 
     // Adapter for the ListView
     ItemCursorAdapter mCursorAdapter;
+
+    public void saleButton(View view) {
+        ContentResolver resolver = getContentResolver();
+        //RelativeLayout rl = (RelativeLayout) view.getParent();
+        int currentItemId = view.getId();
+
+        Uri currentItemUri = Uri.parse(ItemEntry.CONTENT_URI + "/" + currentItemId);
+        Log.i("ShopActivity", currentItemUri.toString());
+        String[] projection = {
+                ItemEntry._ID,
+                ItemEntry.COLUMN_ITEM_NAME,
+                ItemEntry.COLUMN_ITEM_QUANTITY,
+                ItemEntry.COLUMN_ITEM_PRICE,
+                ItemEntry.COLUMN_ITEM_SUPPLIER};
+
+        Cursor cursor = resolver.query(currentItemUri, projection, null, null, null);
+        Log.i("ShopActivity", cursor.toString());
+        if (cursor != null && cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            int quantityColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_QUANTITY);
+            int itemQuantity = cursor.getInt(quantityColumnIndex);
+            cursor.close();
+            int newQuantity = itemQuantity - 1;
+            if (newQuantity < 0) {
+                Toast.makeText(ShopActivity.this, "No Stock Left to buy", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                ContentValues values = new ContentValues();
+                values.put(ItemEntry.COLUMN_ITEM_QUANTITY, newQuantity);
+                resolver.update(currentItemUri, values, null, null);
+                return;
+            }
+        } else {
+            Toast.makeText(ShopActivity.this, "Item can't be found", Toast.LENGTH_SHORT).show();
+            cursor.close();
+            return;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,15 +99,16 @@ public class ShopActivity extends AppCompatActivity implements
         itemListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                // Create new intent to go to {@link EditorActivity}
-                Intent intent = new Intent(ShopActivity.this, EditorActivity.class);
-
                 // Form the content URI that represents the specific pet that was clicked on,
                 // by appending the "id" (passed as input to this method) onto the
                 // {@link PetEntry#CONTENT_URI}.
                 // For example, the URI would be "content://com.example.android.inventoryapp/items/2"
-                // if the pet with ID 2 was clicked on.
+                // if the item with ID 2 was clicked on.
                 Uri currentItemUri = ContentUris.withAppendedId(ItemEntry.CONTENT_URI, id);
+                Log.i("ShopActivity", currentItemUri.toString());
+
+                // Create new intent to go to {@link EditorActivity}
+                Intent intent = new Intent(ShopActivity.this, EditorActivity.class);
 
                 // Set the URI on the data field of the intent
                 intent.setData(currentItemUri);
@@ -74,10 +117,10 @@ public class ShopActivity extends AppCompatActivity implements
                 startActivity(intent);
             }
         });
-
         // Start the Loader
         getLoaderManager().initLoader(ITEM_LOADER, null, this);
     }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
