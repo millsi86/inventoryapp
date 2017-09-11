@@ -231,6 +231,26 @@ public class EditorActivity extends AppCompatActivity implements
             return false;
         }
 
+        if (TextUtils.isEmpty(nameString)) {
+            Toast.makeText(this, R.string.product_name_missing,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(quantityString) || Integer.parseInt(quantityString) < 0) {
+            Toast.makeText(this, R.string.product_quantity_invalid,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        if (TextUtils.isEmpty(priceString) || Float.parseFloat(quantityString) < 0) {
+            Toast.makeText(this, R.string.product_price_invalid,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+
+
         // Modify user inputs into correct format
         Integer quantityInteger = Integer.parseInt(quantityString);
         Float priceInteger = Float.parseFloat(priceString);
@@ -241,7 +261,7 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(ItemEntry.COLUMN_ITEM_PRICE, priceInteger);
         values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, supplierString);
 
-        // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
+        // Determine if this is a new or existing item by checking if mCurrentItemUri is null or not
         if (mCurrentItemUri == null) {
             // This is a NEW item, so insert a new item into the provider,
             // returning the content URI for the new item.

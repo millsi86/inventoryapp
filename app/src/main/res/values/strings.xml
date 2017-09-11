@@ -39,5 +39,7 @@
     <string name="keep_editing">Keep Editing</string>
     <string name="invalid_email_address">Please enter a valid supplier e-mail address</string>
     <string name="product_supplier_title">Supplier:</string>
-
+    <string name="product_name_missing">Please enter a product name</string>
+    <string name="product_quantity_invalid">Please enter a product quantity >= 0</string>
+    <string name="product_price_invalid">Please enter a price > 0</string>
 </resources>
