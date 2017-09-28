@@ -15,8 +15,8 @@
     <string name="product_image_title">Image:</string>
     <string name="quantity_to_adjust_title">Quantity to adjust:</string>
     <string name="hint_quantity_to_adjust">Quantity Change</string>
-    <string name="decrement">Decrement</string>
-    <string name="increment">Increment</string>
+    <string name="decrement">-</string>
+    <string name="increment">+</string>
     <string name="order_button_text">Order</string>
     <string name="delete_product_button_text">Delete Product</string>
     <string name="new_item">Add a new item</string>
@@ -42,4 +42,6 @@
     <string name="product_name_missing">Please enter a product name</string>
     <string name="product_quantity_invalid">Please enter a product quantity >= 0</string>
     <string name="product_price_invalid">Please enter a price > 0</string>
+    <string name="new_image">New Image</string>
+    <string name="image_missing">Please select an Image</string>
 </resources>

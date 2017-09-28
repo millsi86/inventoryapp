@@ -98,49 +98,6 @@
                 android:inputType="textEmailAddress" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/quantity_change_title"
-            style="@style/CategoryStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/activity_margin"
-            android:text="@string/quantity_to_adjust_title" />
-
-        <EditText
-            android:id="@+id/quantity_to_change"
-            style="@style/EditorFieldStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:hint="@string/hint_quantity_to_adjust"
-            android:inputType="number"
-            android:textAlignment="center" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/quantity_decrement_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/decrement" />
-
-            <View
-                android:id="@+id/dummy_view"
-                android:layout_width="@dimen/activity_margin"
-                android:layout_height="0dp" />
-
-            <Button
-                android:id="@+id/quantity_increment_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/increment" />
-        </LinearLayout>
-
         <View
             android:id="@+id/line_one"
             android:layout_width="match_parent"
@@ -148,12 +105,114 @@
             android:layout_marginTop="@dimen/activity_margin"
             android:background="@color/colorAccent" />
 
-        <Button
-            android:id="@+id/order_product_button"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/quantitylayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_margin">
+
+            <View
+                android:id="@+id/dummy1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5" />
+
+            <Button
+                android:id="@+id/quantity_increment_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:text="@string/increment" />
+
+            <View
+                android:id="@+id/dummy2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".2" />
+
+            <EditText
+                android:id="@+id/quantity_to_change"
+                style="@style/EditorFieldStyle"
+                android:layout_weight="2"
+                android:hint="@string/hint_quantity_to_adjust"
+                android:inputType="number"
+                android:textAlignment="center" />
+
+            <View
+                android:id="@+id/dummy3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".2" />
+
+            <Button
+                android:id="@+id/quantity_decrement_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".6"
+                android:text="@string/decrement" />
+
+            <View
+                android:id="@+id/dummy4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line_two"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/activity_margin"
+            android:background="@color/colorAccent" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/activity_margin">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5" />
+
+            <Button
+                android:id="@+id/new_image_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:text="@string/new_image" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4" />
+
+            <Button
+                android:id="@+id/order_product_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="@dimen/ListItem_margin"
+                android:layout_weight="1"
+                android:text="@string/order_button_text" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight=".5" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/activity_margin"
-            android:text="@string/order_button_text" />
+            android:contentDescription="Item Image"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 </ScrollView>

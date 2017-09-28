@@ -170,12 +170,6 @@ public class ItemProvider extends ContentProvider {
         if (price == null || price <= 0) {
             throw new IllegalArgumentException("item requires a price");
         }
-        /*// Creates a formatter
-        NumberFormat formatter = new DecimalFormat("#.##");
-
-        Float price_2dp = Float.parseFloat(formatter.format(price));
-
-        values.put(ItemEntry.COLUMN_ITEM_PRICE, price_2dp);*/
 
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
@@ -282,6 +276,13 @@ public class ItemProvider extends ContentProvider {
             String supplier = values.getAsString(ItemEntry.COLUMN_ITEM_SUPPLIER);
             if (supplier == null) {
                 throw new IllegalArgumentException("Item requires a supplier");
+            }
+        }
+
+        if (values.containsKey(ItemEntry.COLUMN_ITEM_IMAGE)) {
+            String image = values.getAsString(ItemEntry.COLUMN_ITEM_IMAGE);
+            if (image == null) {
+                throw new IllegalArgumentException("Item requires an image");
             }
         }
 

@@ -24,6 +24,8 @@ public class ItemDbHelper extends SQLiteOpenHelper {
      */
     private static final int DATABASE_VERSION = 1;
 
+    private static String SQL_CREATE_INVENTORY_TABLE;
+
     public ItemDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -34,20 +36,28 @@ public class ItemDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create a String that contains the SQL statement to create the inventory table
-        String SQL_CREATE_INVENTORY_TABLE = "CREATE TABLE " + ItemEntry.TABLE_NAME + " ("
+        SQL_CREATE_INVENTORY_TABLE = "CREATE TABLE " + ItemEntry.TABLE_NAME + " ("
                 + ItemEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + ItemEntry.COLUMN_ITEM_NAME + " TEXT NOT NULL, "
                 + ItemEntry.COLUMN_ITEM_QUANTITY + " INTEGER NOT NULL DEFAULT 0, "
                 + ItemEntry.COLUMN_ITEM_PRICE + " REAL NOT NULL, "
-                + ItemEntry.COLUMN_ITEM_SUPPLIER + " TEXT NOT NULL);";
+                + ItemEntry.COLUMN_ITEM_SUPPLIER + " TEXT NOT NULL, "
+                + ItemEntry.COLUMN_ITEM_IMAGE + " TEXT);";
 
         // Execute the SQL statement
         db.execSQL(SQL_CREATE_INVENTORY_TABLE);
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // The database is still at version 1, so there's nothing to do be done here.
-    }
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        /*
+         * Check the versions and update where applicable. For now, this just returns the current
+         * database table, which is better than having just an empty function. In future, this code
+         * can be changed to handle any changes to the database that we need to make.
+         */
 
+        if (oldVersion < 2 || oldVersion < 3) {
+            db.execSQL(SQL_CREATE_INVENTORY_TABLE);
+        }
+    }
 }

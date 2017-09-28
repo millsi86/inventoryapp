@@ -80,6 +80,11 @@ public class ItemContract {
         public static final String COLUMN_ITEM_SUPPLIER = "supplier";
 
         /**
+         * Product image, Type: BLOB
+         */
+        public static final String COLUMN_ITEM_IMAGE = "image";
+
+        /**
          * Returns whether or not the given quantity value is allowed
          */
         public static boolean isValidQuantity(int quantity) {

@@ -1,5 +1,6 @@
 package com.example.android.inventoryapp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -8,10 +9,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
+import android.provider.OpenableColumns;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,10 +28,15 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.ItemContract.ItemEntry;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,34 +47,45 @@ import java.util.regex.Pattern;
 public class EditorActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    /**
-     * Identifier for the item data loader
-     */
+    //Identifier for the item data loader
     private static final int EXISTING_ITEM_LOADER = 0;
 
-    /**
-     * Content URI for the existing item (null if it's a new item)
-     */
+
+    private static final int IMAGE_REQUEST = 0;
+
+
+    private static final String FILE_PROVIDER_AUTHORITY =
+            "com.example.android.inventoryapp.data.ItemContract.ItemEntry";
+
+    // Content URI for the existing item (null if it's a new item)
+    // OnClickListener for if the user pressed the add image button
+    View.OnClickListener getImage = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
+        }
+    };
+    // EditText field to enter the item's name
     private Uri mCurrentItemUri;
 
-    /**
-     * EditText field to enter the item's name
-     */
+    // EditText field to enter the item's quantity
     private EditText mNameEditText;
 
-    /**
-     * EditText field to enter the item's quantity
-     */
+    // EditText field to enter the item's price
     private EditText mQuantityEditText;
-
-    /**
-     * EditText field to enter the item's price
-     */
     private EditText mPriceEditText;
-
-    /**
-     * EditText field to enter the item's supplier contact details
-     */
+    // ImageView of the item's picture
+    private ImageView itemImageView;
+    private Uri currImageURI;
+    private Bitmap bitmap;
+    private String imageUriString;
+    private boolean galleryImage = false;
+    // Boolean flag that keeps track of whether the item has been edited (true) or not (false)
+    private boolean mItemHasChanged = false;
+    // EditText field to enter the item's supplier contact details
     private EditText mSupplierEditText;
     View.OnClickListener orderEmail = new View.OnClickListener() {
         public void onClick(View v) {
@@ -82,9 +104,7 @@ public class EditorActivity extends AppCompatActivity implements
             }
         }
     };
-    /**
-     * EditText field to enter the quantity of the item to change
-     */
+    // EditText field to enter the quantity of the item to change
     private EditText mQuantityChangeEditText;
     View.OnClickListener quantityAdjustment = new View.OnClickListener() {
         public void onClick(View view) {
@@ -107,10 +127,6 @@ public class EditorActivity extends AppCompatActivity implements
             mQuantityEditText.setText(newQuantity.toString());
         }
     };
-    /**
-     * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
-     */
-    private boolean mItemHasChanged = false;
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
@@ -152,6 +168,8 @@ public class EditorActivity extends AppCompatActivity implements
         mPriceEditText = (EditText) findViewById(R.id.edit_product_price);
         mSupplierEditText = (EditText) findViewById(R.id.edit_product_supplier);
         mQuantityChangeEditText = (EditText) findViewById(R.id.quantity_to_change);
+        itemImageView = (ImageView) findViewById(R.id.item_image);
+
 
         // If the intent DOES NOT contain an item content URI, then we know that we are
         // creating a new item.
@@ -160,12 +178,17 @@ public class EditorActivity extends AppCompatActivity implements
             setTitle(getString(R.string.new_item));
 
             // Hide the options to adjust the quantity, order, and delete the product
-            findViewById(R.id.quantity_change_title).setVisibility(View.INVISIBLE);
-            findViewById(R.id.quantity_to_change).setVisibility(View.INVISIBLE);
-            findViewById(R.id.quantity_decrement_button).setVisibility(View.INVISIBLE);
-            findViewById(R.id.quantity_increment_button).setVisibility(View.INVISIBLE);
+            findViewById(R.id.quantity_to_change).setVisibility(View.GONE);
+            findViewById(R.id.quantity_decrement_button).setVisibility(View.GONE);
+            findViewById(R.id.quantity_increment_button).setVisibility(View.GONE);
+            findViewById(R.id.quantitylayout).setVisibility(View.GONE);
+            findViewById(R.id.dummy1).setVisibility(View.GONE);
+            findViewById(R.id.dummy2).setVisibility(View.GONE);
+            findViewById(R.id.dummy3).setVisibility(View.GONE);
+            findViewById(R.id.dummy4).setVisibility(View.GONE);
             findViewById(R.id.order_product_button).setVisibility(View.INVISIBLE);
             findViewById(R.id.line_one).setVisibility(View.INVISIBLE);
+            findViewById(R.id.item_image).setVisibility(View.INVISIBLE);
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
             // (It doesn't make sense to delete a pet that hasn't been created yet.)
@@ -196,14 +219,98 @@ public class EditorActivity extends AppCompatActivity implements
         Button decrement = (Button) findViewById(R.id.quantity_decrement_button);
         Button increment = (Button) findViewById(R.id.quantity_increment_button);
         Button order = (Button) findViewById(R.id.order_product_button);
+        Button newImage = (Button) findViewById(R.id.new_image_button);
 
         // setup click listeners for the buttons
         decrement.setOnClickListener(quantityAdjustment);
         increment.setOnClickListener(quantityAdjustment);
         order.setOnClickListener(orderEmail);
+        newImage.setOnClickListener(getImage);
 
         // hide the keypad on launch of the activity
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        if (resultCode == Activity.RESULT_OK && resultData != null) {
+            currImageURI = resultData.getData();
+            bitmap = getBitmapFromCurrentItemURI(currImageURI);
+            itemImageView.setImageBitmap(bitmap);
+            imageUriString = getShareableImageUri().toString();
+            galleryImage = true;
+        }
+    }
+
+    private Bitmap getBitmapFromCurrentItemURI(Uri uri) {
+        ParcelFileDescriptor parcelFileDescriptor = null;
+        try {
+            parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+            FileDescriptor fileDescriptor = null;
+            if (parcelFileDescriptor != null)
+                fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+
+            Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+            if (parcelFileDescriptor != null) parcelFileDescriptor.close();
+
+            return image;
+        } catch (Exception e) {
+            return null;
+        } finally {
+            try {
+                if (parcelFileDescriptor != null) parcelFileDescriptor.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Uri getShareableImageUri() {
+        Uri imagesUri;
+        if (galleryImage) {
+            String filename = PathFinder();
+            savingInFile(getCacheDir(), filename, bitmap, Bitmap.CompressFormat.JPEG, 100);
+            File imagesFile = new File(getCacheDir(), filename);
+            imagesUri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY, imagesFile);
+        } else {
+            imagesUri = currImageURI;
+        }
+        return imagesUri;
+    }
+
+    public String PathFinder() {
+
+        Cursor returnCursor =
+                getContentResolver().query
+                        (currImageURI, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
+
+        if (returnCursor != null) returnCursor.moveToFirst();
+        String fileNames = null;
+        if (returnCursor != null) fileNames = returnCursor.getString
+                (returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+
+        if (returnCursor != null) returnCursor.close();
+        return fileNames;
+    }
+
+    public boolean savingInFile(File dir, String fileName, Bitmap bm, Bitmap.CompressFormat format,
+                                int quality) {
+
+        File imagesFile = new File(dir, fileName);
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(imagesFile);
+            bm.compress(format, quality, fileOutputStream);
+            fileOutputStream.close();
+            return true;
+        } catch (IOException e) {
+            if (fileOutputStream != null) try {
+                fileOutputStream.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        return false;
     }
 
     private boolean saveItem() {
@@ -249,7 +356,11 @@ public class EditorActivity extends AppCompatActivity implements
             return false;
         }
 
-
+        if (TextUtils.isEmpty(imageUriString)) {
+            Toast.makeText(this, R.string.image_missing,
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
 
         // Modify user inputs into correct format
         Integer quantityInteger = Integer.parseInt(quantityString);
@@ -260,6 +371,7 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(ItemEntry.COLUMN_ITEM_QUANTITY, quantityInteger);
         values.put(ItemEntry.COLUMN_ITEM_PRICE, priceInteger);
         values.put(ItemEntry.COLUMN_ITEM_SUPPLIER, supplierString);
+        values.put(ItemEntry.COLUMN_ITEM_IMAGE, imageUriString);
 
         // Determine if this is a new or existing item by checking if mCurrentItemUri is null or not
         if (mCurrentItemUri == null) {
@@ -356,7 +468,7 @@ public class EditorActivity extends AppCompatActivity implements
                 if (saveOk) {
                     finish();
                 }
-                return true;
+                return false;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
                 // Pop up confirmation dialog for deletion
@@ -398,7 +510,8 @@ public class EditorActivity extends AppCompatActivity implements
                 ItemEntry.COLUMN_ITEM_NAME,
                 ItemEntry.COLUMN_ITEM_QUANTITY,
                 ItemEntry.COLUMN_ITEM_PRICE,
-                ItemEntry.COLUMN_ITEM_SUPPLIER};
+                ItemEntry.COLUMN_ITEM_SUPPLIER,
+                ItemEntry.COLUMN_ITEM_IMAGE};
 
         // This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,   // Parent activity context
@@ -428,12 +541,14 @@ public class EditorActivity extends AppCompatActivity implements
             int quantityColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_QUANTITY);
             int priceColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_PRICE);
             int supplierColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_SUPPLIER);
+            int imageColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_ITEM_IMAGE);
 
             // Read the item attributs from the Cursor for the current pet
             String itemName = cursor.getString(nameColumnIndex);
             int itemQuantity = cursor.getInt(quantityColumnIndex);
             Double itemPrice = Double.valueOf(cursor.getString(priceColumnIndex));
             String itemSupplier = cursor.getString(supplierColumnIndex);
+            imageUriString = cursor.getString(imageColumnIndex);
 
             // formats the price to 2dp
             String itemprice_2dp = String.format("%.2f", itemPrice);
@@ -443,6 +558,9 @@ public class EditorActivity extends AppCompatActivity implements
             mQuantityEditText.setText(Integer.toString(itemQuantity));
             mPriceEditText.setText(itemprice_2dp);
             mSupplierEditText.setText(itemSupplier);
+
+            Uri imageUri = Uri.parse(imageUriString);
+            itemImageView.setImageURI(imageUri);
         }
     }
 
