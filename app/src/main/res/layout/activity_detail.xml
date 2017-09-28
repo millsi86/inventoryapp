@@ -185,6 +185,7 @@
                 android:text="@string/new_image" />
 
             <View
+                android:id="@+id/buttonsMiddleSpace"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="4" />
@@ -213,6 +214,6 @@
             android:layout_marginTop="@dimen/activity_margin"
             android:contentDescription="Item Image"
             android:scaleType="fitCenter"
-            android:src="@mipmap/ic_launcher" />
+            tools:src="@mipmap/ic_launcher" />
     </LinearLayout>
 </ScrollView>

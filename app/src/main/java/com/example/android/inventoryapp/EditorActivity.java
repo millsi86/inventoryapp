@@ -50,12 +50,60 @@ public class EditorActivity extends AppCompatActivity implements
     //Identifier for the item data loader
     private static final int EXISTING_ITEM_LOADER = 0;
 
-
+    // Activity Request code for getting an item image
     private static final int IMAGE_REQUEST = 0;
 
-
+    // New Image file provider authority
     private static final String FILE_PROVIDER_AUTHORITY =
             "com.example.android.inventoryapp.data.ItemContract.ItemEntry";
+
+    // Uri for the current item
+    private Uri mCurrentItemUri;
+
+    // EditText field to enter the item's name
+    private EditText mNameEditText;
+
+    // EditText field to enter the item's quantity
+    private EditText mQuantityEditText;
+
+    // EditText field for the item's price
+    private EditText mPriceEditText;
+
+    // ImageView of the item's picture
+    private ImageView itemImageView;
+
+    // Uri of the item's image from the gallery
+    private Uri currImageURI;
+
+    // Bitmap of the item image
+    private Bitmap bitmap;
+
+    // Local Uri of the image
+    private String imageUriString;
+
+    // Flag for if an image has been selected from the gallery
+    private boolean galleryImage = false;
+
+    // Boolean flag that keeps track of whether the item has been edited (true) or not (false)
+    private boolean mItemHasChanged = false;
+
+    // EditText field to enter the item's supplier contact details
+    private EditText mSupplierEditText;
+
+    // EditText field to enter the quantity of the item to change
+    private EditText mQuantityChangeEditText;
+
+    /**
+     * OnTouchListener that listens for any user touches on a View, implying that they are modifying
+     * the view, and we change the mItemHasChanged boolean to true.
+     */
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mItemHasChanged = true;
+            return false;
+        }
+    };
 
     // Content URI for the existing item (null if it's a new item)
     // OnClickListener for if the user pressed the add image button
@@ -68,25 +116,8 @@ public class EditorActivity extends AppCompatActivity implements
             startActivityForResult(Intent.createChooser(intent, "Select Picture"), IMAGE_REQUEST);
         }
     };
-    // EditText field to enter the item's name
-    private Uri mCurrentItemUri;
 
-    // EditText field to enter the item's quantity
-    private EditText mNameEditText;
-
-    // EditText field to enter the item's price
-    private EditText mQuantityEditText;
-    private EditText mPriceEditText;
-    // ImageView of the item's picture
-    private ImageView itemImageView;
-    private Uri currImageURI;
-    private Bitmap bitmap;
-    private String imageUriString;
-    private boolean galleryImage = false;
-    // Boolean flag that keeps track of whether the item has been edited (true) or not (false)
-    private boolean mItemHasChanged = false;
-    // EditText field to enter the item's supplier contact details
-    private EditText mSupplierEditText;
+    // OnClickListener for the order button to launch an e-mail application
     View.OnClickListener orderEmail = new View.OnClickListener() {
         public void onClick(View v) {
             String[] email = {mSupplierEditText.getText().toString().trim()};
@@ -104,8 +135,8 @@ public class EditorActivity extends AppCompatActivity implements
             }
         }
     };
-    // EditText field to enter the quantity of the item to change
-    private EditText mQuantityChangeEditText;
+
+    // OnClickListener for the Quantity Change Buttons
     View.OnClickListener quantityAdjustment = new View.OnClickListener() {
         public void onClick(View view) {
             Integer QuantityChangeAmount = Integer.valueOf(mQuantityChangeEditText.getText().toString().trim());
@@ -125,17 +156,6 @@ public class EditorActivity extends AppCompatActivity implements
                     break;
             }
             mQuantityEditText.setText(newQuantity.toString());
-        }
-    };
-    /**
-     * OnTouchListener that listens for any user touches on a View, implying that they are modifying
-     * the view, and we change the mItemHasChanged boolean to true.
-     */
-    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            mItemHasChanged = true;
-            return false;
         }
     };
 
@@ -186,9 +206,11 @@ public class EditorActivity extends AppCompatActivity implements
             findViewById(R.id.dummy2).setVisibility(View.GONE);
             findViewById(R.id.dummy3).setVisibility(View.GONE);
             findViewById(R.id.dummy4).setVisibility(View.GONE);
-            findViewById(R.id.order_product_button).setVisibility(View.INVISIBLE);
+            findViewById(R.id.order_product_button).setVisibility(View.GONE);
             findViewById(R.id.line_one).setVisibility(View.INVISIBLE);
-            findViewById(R.id.item_image).setVisibility(View.INVISIBLE);
+            findViewById(R.id.buttonsMiddleSpace).setVisibility(View.GONE);
+            //findViewById(R.id.item_image).setVisibility(View.INVISIBLE);
+            //findViewById(R.id.new_image_button).;
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
             // (It doesn't make sense to delete a pet that hasn't been created yet.)
@@ -231,9 +253,12 @@ public class EditorActivity extends AppCompatActivity implements
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
+    // Once an image has been selected from the gallery this code will run to process the image
+    // data to get the Image Uri
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
         if (resultCode == Activity.RESULT_OK && resultData != null) {
+            galleryImage = false;
             currImageURI = resultData.getData();
             bitmap = getBitmapFromCurrentItemURI(currImageURI);
             itemImageView.setImageBitmap(bitmap);
@@ -313,6 +338,7 @@ public class EditorActivity extends AppCompatActivity implements
         return false;
     }
 
+    // runs when the item save button is pressed to pass the data into the SQLite database
     private boolean saveItem() {
         // Read from input fields
         // Use trin to eliminate leading or trailing white space
@@ -472,7 +498,7 @@ public class EditorActivity extends AppCompatActivity implements
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:
                 // Pop up confirmation dialog for deletion
-                //showDeleteConfirmationDialog();
+                showDeleteConfirmationDialog();
                 return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
@@ -620,7 +646,7 @@ public class EditorActivity extends AppCompatActivity implements
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Delete" button, so delete the pet.
-                //deleteItem();
+                deleteItem();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -636,5 +662,34 @@ public class EditorActivity extends AppCompatActivity implements
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+
+        // adjust the colours of the buttons
+        Button buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        buttonPositive.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+        Button buttonNegative = alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        buttonNegative.setTextColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+    }
+
+    private void deleteItem() {
+        // Only perform the delete if this is an existing item
+        if (mCurrentItemUri != null) {
+            /*
+             * Call the ContentResolver to delete the item at the given content URI. Pass in null
+             * for the selection and selection args because the currentItemUri content URI already
+             * identifies the item that we want.
+             */
+            int rowsDeleted = getContentResolver().delete(mCurrentItemUri, null, null);
+
+            // Show a toast message depending on whether or not the delete was successful.
+            // if no rows were deleted, then there was an error with the delete
+            // Otherwise, the delete was successful and we can display a toast to say so.
+            if (rowsDeleted == 0)
+                Toast.makeText(this, getString(R.string.editor_delete_item_failed),
+                        Toast.LENGTH_SHORT).show();
+            else Toast.makeText(this, getString(R.string.editor_delete_item_successful),
+                    Toast.LENGTH_SHORT).show();
+        }
+        // Close the activity
+        finish();
     }
 }

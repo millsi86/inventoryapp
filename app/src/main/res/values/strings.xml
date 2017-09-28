@@ -32,7 +32,7 @@
     <string name="title_price">Price:</string>
     <string name="currency">£</string>
     <string name="cancel">Cancel</string>
-    <string name="delete_dialog_msg">Delete this pet?</string>
+    <string name="delete_dialog_msg">Delete this item?</string>
     <string name="delete">Delete</string>
     <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
     <string name="discard">Discard</string>
@@ -44,4 +44,6 @@
     <string name="product_price_invalid">Please enter a price > 0</string>
     <string name="new_image">New Image</string>
     <string name="image_missing">Please select an Image</string>
+    <string name="editor_delete_item_failed">Error Deleting Item</string>
+    <string name="editor_delete_item_successful">Item Deleted</string>
 </resources>
