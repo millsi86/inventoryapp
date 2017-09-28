@@ -75,8 +75,6 @@
                     android:layout_width="match_parent"
                     android:hint="@string/hint_product_price"
                     android:inputType="numberDecimal" />
-                <!--android:longClickable="false"
-                    android:clickable="false"-->
             </LinearLayout>
         </LinearLayout>
 
@@ -101,7 +99,7 @@
         <View
             android:id="@+id/line_one"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/line_height"
             android:layout_marginTop="@dimen/activity_margin"
             android:background="@color/colorAccent" />
 
@@ -162,7 +160,7 @@
         <View
             android:id="@+id/line_two"
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/line_height"
             android:layout_marginTop="@dimen/activity_margin"
             android:background="@color/colorAccent" />
 
@@ -209,7 +207,7 @@
         <ImageView
             android:id="@+id/item_image"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="@dimen/item_image_height"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/activity_margin"
             android:contentDescription="Item Image"

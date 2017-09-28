@@ -209,8 +209,6 @@ public class EditorActivity extends AppCompatActivity implements
             findViewById(R.id.order_product_button).setVisibility(View.GONE);
             findViewById(R.id.line_one).setVisibility(View.INVISIBLE);
             findViewById(R.id.buttonsMiddleSpace).setVisibility(View.GONE);
-            //findViewById(R.id.item_image).setVisibility(View.INVISIBLE);
-            //findViewById(R.id.new_image_button).;
 
             // Invalidate the options menu, so the "Delete" menu option can be hidden.
             // (It doesn't make sense to delete a pet that hasn't been created yet.)
