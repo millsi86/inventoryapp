@@ -139,23 +139,28 @@ public class EditorActivity extends AppCompatActivity implements
     // OnClickListener for the Quantity Change Buttons
     View.OnClickListener quantityAdjustment = new View.OnClickListener() {
         public void onClick(View view) {
-            Integer QuantityChangeAmount = Integer.valueOf(mQuantityChangeEditText.getText().toString().trim());
-            Integer CurrentQuantity = Integer.valueOf(mQuantityEditText.getText().toString().trim());
-            Integer newQuantity = 0;
-            switch (view.getId()) {
-                case R.id.quantity_decrement_button:
-                    if (CurrentQuantity - QuantityChangeAmount >= 0) {
-                        newQuantity = CurrentQuantity - QuantityChangeAmount;
-                    } else {
-                        Toast.makeText(EditorActivity.this, "New Quantity is invalid.", Toast.LENGTH_SHORT).show();
-                        newQuantity = CurrentQuantity;
-                    }
-                    break;
-                case R.id.quantity_increment_button:
-                    newQuantity = CurrentQuantity + QuantityChangeAmount;
-                    break;
+            if(TextUtils.isEmpty(mQuantityChangeEditText.getText())){
+                Toast.makeText(EditorActivity.this, "Please Enter a Quantity amount to change.", Toast.LENGTH_SHORT).show();
             }
-            mQuantityEditText.setText(newQuantity.toString());
+            else {
+                Integer QuantityChangeAmount = Integer.valueOf(mQuantityChangeEditText.getText().toString().trim());
+                Integer CurrentQuantity = Integer.valueOf(mQuantityEditText.getText().toString().trim());
+                Integer newQuantity = 0;
+                switch (view.getId()) {
+                    case R.id.quantity_decrement_button:
+                        if (CurrentQuantity - QuantityChangeAmount >= 0) {
+                            newQuantity = CurrentQuantity - QuantityChangeAmount;
+                        } else {
+                            Toast.makeText(EditorActivity.this, "New Quantity is invalid.", Toast.LENGTH_SHORT).show();
+                            newQuantity = CurrentQuantity;
+                        }
+                        break;
+                    case R.id.quantity_increment_button:
+                        newQuantity = CurrentQuantity + QuantityChangeAmount;
+                        break;
+                }
+                mQuantityEditText.setText(newQuantity.toString());
+            }
         }
     };
 
@@ -388,7 +393,7 @@ public class EditorActivity extends AppCompatActivity implements
 
         // Modify user inputs into correct format
         Integer quantityInteger = Integer.parseInt(quantityString);
-        Float priceInteger = Float.parseFloat(priceString);
+        Float priceInteger = Float.parseFloat(priceString.replace(",","."));
 
         ContentValues values = new ContentValues();
         values.put(ItemEntry.COLUMN_ITEM_NAME, nameString);
